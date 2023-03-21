@@ -60,7 +60,8 @@ class Tests_Sitemaps_wpSitemapsTaxonomies extends WP_UnitTestCase {
 		$expected_cats = array_map(
 			static function ( $id ) use ( $post ) {
 				return array(
-					'loc' => get_term_link( $id, 'category' ),
+					'loc'     => get_term_link( $id, 'category' ),
+					'lastmod' => gmdate( 'c', strtotime( $post->post_modified_gmt ) ),
 				);
 			},
 			$categories
@@ -73,7 +74,8 @@ class Tests_Sitemaps_wpSitemapsTaxonomies extends WP_UnitTestCase {
 		$expected_tags = array_map(
 			static function ( $id ) use ( $post ) {
 				return array(
-					'loc' => get_term_link( $id, 'post_tag' ),
+					'loc'     => get_term_link( $id, 'post_tag' ),
+					'lastmod' => gmdate( 'c', strtotime( $post->post_modified_gmt ) ),
 				);
 			},
 			self::$post_tags
@@ -102,7 +104,8 @@ class Tests_Sitemaps_wpSitemapsTaxonomies extends WP_UnitTestCase {
 		$expected = array_map(
 			static function ( $id ) use ( $taxonomy, $post ) {
 				return array(
-					'loc' => get_term_link( $id, $taxonomy ),
+					'loc'     => get_term_link( $id, $taxonomy ),
+					'lastmod' => gmdate( 'c', strtotime( $post->post_modified_gmt ) ),
 				);
 			},
 			$terms
