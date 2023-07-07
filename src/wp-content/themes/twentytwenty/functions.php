@@ -196,6 +196,9 @@ function twentytwenty_register_styles() {
 	// Add print CSS.
 	wp_enqueue_style( 'twentytwenty-print-style', get_template_directory_uri() . '/print.css', null, $theme_version, 'print' );
 
+	// Remove default styles for Button and File blocks.
+	wp_dequeue_style( 'classic-theme-styles' );
+
 }
 
 add_action( 'wp_enqueue_scripts', 'twentytwenty_register_styles' );
@@ -413,6 +416,9 @@ add_action( 'widgets_init', 'twentytwenty_sidebar_registration' );
  * @since Twenty Twenty 1.0
  */
 function twentytwenty_block_editor_styles() {
+
+	// Remove default styles for Button and File blocks.
+	wp_dequeue_style( 'classic-theme-styles' );
 
 	// Enqueue the editor styles.
 	wp_enqueue_style( 'twentytwenty-block-editor-styles', get_theme_file_uri( '/assets/css/editor-style-block.css' ), array(), wp_get_theme()->get( 'Version' ), 'all' );
