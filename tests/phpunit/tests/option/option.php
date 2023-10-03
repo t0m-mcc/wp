@@ -381,13 +381,17 @@ class Tests_Option_Option extends WP_UnitTestCase {
 	public function test_update_loosey_options( $old_value, $new_value, $update = false ) {
 		add_option( 'foo', $old_value );
 
+		$num_queries = get_num_queries();
+
 		// Comparison will happen against value cached during add_option() above.
 		$updated = update_option( 'foo', $new_value );
 
 		if ( $update ) {
 			$this->assertTrue( $updated, 'This loosely equal option should trigger an update.' );
+			$this->assertSame( 1, get_num_queries() - $num_queries, 'There should be one additional database query to update the option.' );
 		} else {
 			$this->assertFalse( $updated, 'Loosely equal option should not trigger an update.' );
+			$this->assertSame( $num_queries, get_num_queries(), 'The number of database queries should not change.' );
 		}
 	}
 
@@ -403,14 +407,21 @@ class Tests_Option_Option extends WP_UnitTestCase {
 	public function test_update_loosey_options_from_db( $old_value, $new_value, $update = false ) {
 		add_option( 'foo', $old_value );
 
+		$num_queries = get_num_queries();
+
 		// Delete cache.
 		wp_cache_delete( 'alloptions', 'options' );
 		$updated = update_option( 'foo', $new_value );
 
+		// One query will run to get the original value, when not in cache.
+		$expected_queries = $num_queries + 1;
+
 		if ( $update ) {
 			$this->assertTrue( $updated, 'This loosely equal option should trigger an update.' );
+			$this->assertSame( 1, get_num_queries() - $expected_queries, 'There should be one additional database query to update the option.' );
 		} else {
 			$this->assertFalse( $updated, 'Loosely equal option should not trigger an update.' );
+			$this->assertSame( $expected_queries, get_num_queries(), 'No additional queries should run.' );
 		}
 	}
 
@@ -430,12 +441,17 @@ class Tests_Option_Option extends WP_UnitTestCase {
 		wp_cache_delete( 'alloptions', 'options' );
 		wp_load_alloptions();
 
+		// Get the current number of queries after the cache is refreshed.
+		$num_queries = get_num_queries();
+
 		$updated = update_option( 'foo', $new_value );
 
 		if ( $update ) {
 			$this->assertTrue( $updated, 'This loosely equal option should trigger an update.' );
+			$this->assertSame( 1, get_num_queries() - $num_queries, 'There should be one additional database query to update the option.' );
 		} else {
 			$this->assertFalse( $updated, 'Loosely equal option should not trigger an update.' );
+			$this->assertSame( $num_queries, get_num_queries(), 'The number of database queries should not change.' );
 		}
 	}
 
@@ -445,6 +461,13 @@ class Tests_Option_Option extends WP_UnitTestCase {
 	 * @return array
 	 */
 	public function data_update_option_type_juggling() {
+		/*
+		 * This set of use cases returns params for unit tests in the following format.
+		 *
+		 * @param any       $old_value The initial option value before an update.
+		 * @param any       $new_value The new value being passed to update_option().
+		 * @param null|bool $updated   Optional. The expected return value from update_option. Default false.
+		 */
 		return array(
 			/*
 			 * Truthy values.
