@@ -96,7 +96,6 @@ $tagline_description = sprintf(
 <td><input name="blogdescription" type="text" id="blogdescription" aria-describedby="tagline-description" value="<?php form_option( 'blogdescription' ); ?>" class="regular-text" />
 <p class="description" id="tagline-description"><?php echo $tagline_description; ?></p></td>
 </tr>
-
 <?php
 if ( ! is_multisite() ) {
 	$wp_site_url_class = '';
@@ -108,7 +107,6 @@ if ( ! is_multisite() ) {
 		$wp_home_class = ' disabled';
 	}
 	?>
-
 <tr>
 <th scope="row"><label for="siteurl"><?php _e( 'WordPress Address (URL)' ); ?></label></th>
 <td><input name="siteurl" type="url" id="siteurl" value="<?php form_option( 'siteurl' ); ?>"<?php disabled( defined( 'WP_SITEURL' ) ); ?> class="regular-text code<?php echo $wp_site_url_class; ?>" /></td>
@@ -448,6 +446,23 @@ endfor;
 ?>
 </select></td>
 </tr>
+/*
+* Add option to enable the classic editor without a plugin
+*/
+<tr>
+<th><label for="classic_editor_enabled"><?php _e( 'Enable Classic Editor' ); ?></label></th>
+<td><input type="checkbox" name="classic_editor_enabled" id="classic_editor_enabled" value="enabled" <?php checked( $classic_editor_enabled, 'enabled' ); ?>><?php _e( 'Enable Classic Editor' ); ?><td>
+<tr>
+<?php
+// Disable Gutenberg if the checkbox is checked
+add_filter( 'use_block_editor_for_post', 'disable_gutenberg_on_check', 10, 2 );
+function disable_gutenberg_on_check( $use_block_editor, $post ) {
+if ( get_option( 'classic_editor_enabled', 'enabled' ) === 'enabled' ) {
+    return false;
+}
+return $use_block_editor;
+}
+?>
 <?php do_settings_fields( 'general', 'default' ); ?>
 </table>
 
