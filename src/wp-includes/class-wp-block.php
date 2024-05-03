@@ -591,7 +591,7 @@ class WP_Block {
 	protected function populate_attributes() {
 		// Originally, attributes could only be calculated once.
 		// Therefore, this method should exit if the attributes property has already been set.
-		if ( isset($this->attributes) ) {
+		if ( isset( $this->attributes ) ) {
 			return;
 		}
 
