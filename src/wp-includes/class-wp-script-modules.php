@@ -72,7 +72,10 @@ class WP_Script_Modules {
 					}
 					$dependencies[] = array(
 						'id'     => $dependency['id'],
-						'import' => isset( $dependency['import'] ) && 'dynamic' === $dependency['import'] ? 'dynamic' : 'static',
+						'import' => isset( $dependency['import'] ) &&
+							'dynamic' === $dependency['import'] ||
+							'wp-script' === $dependency['import']
+							? $dependency['import'] : 'static',
 					);
 				} elseif ( is_string( $dependency ) ) {
 					$dependencies[] = array(
@@ -199,6 +202,13 @@ class WP_Script_Modules {
 					'id'   => $id . '-js-module',
 				)
 			);
+
+			foreach ( $script_module['dependencies'] as $dependency ) {
+				if ( 'wp-script' !== $dependency['import'] ) {
+					continue;
+				}
+				wp_enqueue_script( $dependency['id'] );
+			}
 		}
 	}
 
@@ -254,6 +264,15 @@ class WP_Script_Modules {
 					'id'   => 'wp-importmap',
 				)
 			);
+
+			foreach ( $import_map['imports'] as $id => $_ ) {
+				foreach ( $this->registered[ $id ]['dependencies'] as $dependency ) {
+					if ( 'wp-script' !== $dependency['import'] ) {
+						continue;
+					}
+					wp_enqueue_script( $dependency['id'] );
+				}
+			}
 		}
 	}
 
