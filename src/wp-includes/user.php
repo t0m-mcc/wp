@@ -4321,7 +4321,7 @@ function _wp_privacy_send_erasure_fulfillment_notification( $request_id ) {
 	if ( ! empty( $request->user_id ) ) {
 		$switched_locale = switch_to_user_locale( $request->user_id );
 	} else {
-		$switched_locale = switch_to_locale( get_locale() );
+		$switched_locale = switch_to_locale( get_admin_locale() );
 	}
 
 	/**
@@ -4730,7 +4730,7 @@ function wp_send_user_request( $request_id ) {
 	if ( ! empty( $request->user_id ) ) {
 		$switched_locale = switch_to_user_locale( $request->user_id );
 	} else {
-		$switched_locale = switch_to_locale( get_locale() );
+		$switched_locale = switch_to_locale( get_admin_locale() );
 	}
 
 	$email_data = array(
