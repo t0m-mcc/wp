@@ -743,6 +743,11 @@
 				display: none;
 			}
 		}
+
+		&.aligncenter {
+			margin-left: auto;
+			margin-right: auto;
+		}
 	}
 
 	//! Twitter Embed
