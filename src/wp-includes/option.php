@@ -1269,6 +1269,8 @@ function delete_option( $option ) {
  * @since 6.6.0
  * @access private
  *
+ * @global array $wp_registered_settings
+ *
  * @param string $option          The name of the option.
  * @param mixed $value            The value of the option to check its autoload value.
  * @param mixed $serialized_value The serialized value of the option to check its autoload value.
@@ -1297,6 +1299,13 @@ function wp_determine_option_autoload_value( $option, $value, $serialized_value,
 			return 'off';
 	}
 
+	$wp_registered_settings = get_registered_settings();
+	if ( isset( $wp_registered_settings[ $option ]['autoload'] ) ) {
+		$default_autoload_value = ( bool ) $wp_registered_settings[ $option ]['autoload'];
+	} else {
+		$default_autoload_value = null;
+	}
+
 	/**
 	 * Allows to determine the default autoload value for an option where no explicit value is passed.
 	 *
@@ -1307,7 +1316,7 @@ function wp_determine_option_autoload_value( $option, $value, $serialized_value,
 	 * @param string    $option   The passed option name.
 	 * @param mixed     $value    The passed option value to be saved.
 	 */
-	$autoload = apply_filters( 'wp_default_autoload_value', null, $option, $value, $serialized_value );
+	$autoload = apply_filters( 'wp_default_autoload_value',$default_autoload_value , $option, $value, $serialized_value );
 	if ( is_bool( $autoload ) ) {
 		return $autoload ? 'auto-on' : 'auto-off';
 	}
@@ -2681,6 +2690,7 @@ function register_initial_settings() {
 			'type'         => 'string',
 			'label'        => __( 'Title' ),
 			'description'  => __( 'Site title.' ),
+			'autoload'     => true,
 		)
 	);
 
@@ -2694,6 +2704,7 @@ function register_initial_settings() {
 			'type'         => 'string',
 			'label'        => __( 'Tagline' ),
 			'description'  => __( 'Site tagline.' ),
+			'autoload'     => false,
 		)
 	);
 
@@ -2710,6 +2721,7 @@ function register_initial_settings() {
 				),
 				'type'         => 'string',
 				'description'  => __( 'Site URL.' ),
+				'autoload'     => false,
 			)
 		);
 	}
@@ -2727,6 +2739,7 @@ function register_initial_settings() {
 				),
 				'type'         => 'string',
 				'description'  => __( 'This address is used for admin purposes, like new user notification.' ),
+				'autoload'     => false,
 			)
 		);
 	}
@@ -2740,6 +2753,7 @@ function register_initial_settings() {
 			),
 			'type'         => 'string',
 			'description'  => __( 'A city in the same timezone as you.' ),
+			'autoload'     => true,
 		)
 	);
 
@@ -2750,6 +2764,7 @@ function register_initial_settings() {
 			'show_in_rest' => true,
 			'type'         => 'string',
 			'description'  => __( 'A date format for all date strings.' ),
+			'autoload'     => true,
 		)
 	);
 
@@ -2760,6 +2775,7 @@ function register_initial_settings() {
 			'show_in_rest' => true,
 			'type'         => 'string',
 			'description'  => __( 'A time format for all time strings.' ),
+			'autoload'     => false,
 		)
 	);
 
@@ -2770,6 +2786,7 @@ function register_initial_settings() {
 			'show_in_rest' => true,
 			'type'         => 'integer',
 			'description'  => __( 'A day number of the week that the week should start on.' ),
+			'autoload'     => false,
 		)
 	);
 
@@ -2783,6 +2800,7 @@ function register_initial_settings() {
 			'type'         => 'string',
 			'description'  => __( 'WordPress locale code.' ),
 			'default'      => 'en_US',
+			'autoload'     => true,
 		)
 	);
 
@@ -2794,6 +2812,7 @@ function register_initial_settings() {
 			'type'         => 'boolean',
 			'description'  => __( 'Convert emoticons like :-) and :-P to graphics on display.' ),
 			'default'      => true,
+			'autoload'     => true,
 		)
 	);
 
@@ -2804,6 +2823,7 @@ function register_initial_settings() {
 			'show_in_rest' => true,
 			'type'         => 'integer',
 			'description'  => __( 'Default post category.' ),
+			'autoload'     => false,
 		)
 	);
 
@@ -2814,6 +2834,7 @@ function register_initial_settings() {
 			'show_in_rest' => true,
 			'type'         => 'string',
 			'description'  => __( 'Default post format.' ),
+			'autoload'     => false,
 		)
 	);
 
@@ -2826,6 +2847,7 @@ function register_initial_settings() {
 			'label'        => __( 'Maximum posts per page' ),
 			'description'  => __( 'Blog pages show at most.' ),
 			'default'      => 10,
+			'autoload'     => true,
 		)
 	);
 
@@ -2837,6 +2859,7 @@ function register_initial_settings() {
 			'type'         => 'string',
 			'label'        => __( 'Show on front' ),
 			'description'  => __( 'What to show on the front page' ),
+			'autoload'     => true,
 		)
 	);
 
@@ -2848,6 +2871,7 @@ function register_initial_settings() {
 			'type'         => 'integer',
 			'label'        => __( 'Page on front' ),
 			'description'  => __( 'The ID of the page that should be displayed on the front page' ),
+			'autoload'     => true,
 		)
 	);
 
@@ -2858,6 +2882,7 @@ function register_initial_settings() {
 			'show_in_rest' => true,
 			'type'         => 'integer',
 			'description'  => __( 'The ID of the page that should display the latest posts' ),
+			'autoload'     => true,
 		)
 	);
 
@@ -2872,6 +2897,7 @@ function register_initial_settings() {
 			),
 			'type'         => 'string',
 			'description'  => __( 'Allow link notifications from other blogs (pingbacks and trackbacks) on new articles.' ),
+			'autoload'     => true,
 		)
 	);
 
@@ -2887,6 +2913,7 @@ function register_initial_settings() {
 			'type'         => 'string',
 			'label'        => __( 'Allow comments on new posts' ),
 			'description'  => __( 'Allow people to submit comments on new posts.' ),
+			'autoload'     => true,
 		)
 	);
 }
@@ -2921,6 +2948,7 @@ function register_initial_settings() {
  *                                         When registering complex settings, this argument may optionally be an
  *                                         array with a 'schema' key.
  *     @type mixed      $default           Default value when calling `get_option()`.
+ *     @type bool       $autoload          Should this setting be set to autoload for all pages, default is false
  * }
  */
 function register_setting( $option_group, $option_name, $args = array() ) {
@@ -2939,6 +2967,7 @@ function register_setting( $option_group, $option_name, $args = array() ) {
 		'description'       => '',
 		'sanitize_callback' => null,
 		'show_in_rest'      => false,
+		'autoload'          => false,
 	);
 
 	// Back-compat: old sanitize callback is added.
