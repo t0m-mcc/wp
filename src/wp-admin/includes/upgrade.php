@@ -863,6 +863,9 @@ function upgrade_all() {
 		upgrade_650();
 	}
 
+	if ( $wp_current_db_version < 57160 ) {
+		upgrade_670();
+	}
 	maybe_disable_link_manager();
 
 	maybe_disable_automattic_widgets();
@@ -989,7 +992,7 @@ function upgrade_110() {
 
 	$time_difference = $all_options->time_difference;
 
-		$server_time = time() + gmdate( 'Z' );
+	$server_time     = time() + gmdate( 'Z' );
 	$weblogger_time  = $server_time + $time_difference * HOUR_IN_SECONDS;
 	$gmt_time        = time();
 
@@ -2397,7 +2400,44 @@ function upgrade_650() {
 		wp_set_option_autoload_values( $autoload );
 	}
 }
+/**
+ * Executes changes made in WordPress 6.7.0.
+ *
+ * @ignore
+ * @since 6.7.0
+ *
+ * @global int  $wp_current_db_version The old (current) database version.
+ */
+function upgrade_670() {
+	global $wp_current_db_version;
 
+	if ( $wp_current_db_version < 57160 ) {
+		$options_ids = array(
+			'auto_plugin_theme_update_emails',
+			'recently_activated',
+			'_wp_suggested_policy_text_has_changed',
+			'dashboard_widget_options',
+			'ftp_credentials',
+			'recently_edited',
+			'adminhash',
+			'nav_menu_options',
+			'active_plugins',
+			'uninstall_plugins',
+			'wp_force_deactivated_plugins',
+			'delete_blog_hash',
+			'allowedthemes',
+			'admin_email',
+			'recently_activated',
+			'https_detection_errors',
+			'fresh_site',
+			'upload_path',
+			'admin_email',
+			'admin_email_lifespan',
+		);
+
+		wp_set_options_autoload( $options_ids, 'no' );
+	}
+}
 /**
  * Executes network-level upgrade routines.
  *

@@ -642,17 +642,17 @@ function install_blog( $blog_id, $blog_title = '' ) {
 		}
 	}
 
-	update_option( 'siteurl', $siteurl );
-	update_option( 'home', $home );
+	update_option( 'siteurl', $siteurl, true );
+	update_option( 'home', $home, true );
 
 	if ( get_site_option( 'ms_files_rewriting' ) ) {
-		update_option( 'upload_path', UPLOADBLOGSDIR . "/$blog_id/files" );
+		update_option( 'upload_path', UPLOADBLOGSDIR . "/$blog_id/files", false );
 	} else {
-		update_option( 'upload_path', get_blog_option( get_network()->site_id, 'upload_path' ) );
+		update_option( 'upload_path', get_blog_option( get_network()->site_id, 'upload_path' ), false );
 	}
 
-	update_option( 'blogname', wp_unslash( $blog_title ) );
-	update_option( 'admin_email', '' );
+	update_option( 'blogname', wp_unslash( $blog_title ), true );
+	update_option( 'admin_email', '', false );
 
 	// Remove all permissions.
 	$table_prefix = $wpdb->get_blog_prefix();

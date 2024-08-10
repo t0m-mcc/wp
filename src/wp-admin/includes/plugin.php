@@ -711,7 +711,7 @@ function activate_plugin( $plugin, $redirect = '', $network_wide = false, $silen
 			$current   = get_option( 'active_plugins', array() );
 			$current[] = $plugin;
 			sort( $current );
-			update_option( 'active_plugins', $current );
+			update_option( 'active_plugins', $current, false );
 		}
 
 		if ( ! $silent ) {
@@ -842,7 +842,7 @@ function deactivate_plugins( $plugins, $silent = false, $network_wide = null ) {
 	}
 
 	if ( $do_blog ) {
-		update_option( 'active_plugins', $current );
+		update_option( 'active_plugins', $current, false );
 	}
 	if ( $do_network ) {
 		update_site_option( 'active_sitewide_plugins', $network_current );
@@ -1070,7 +1070,7 @@ function validate_active_plugins() {
 	$plugins = get_option( 'active_plugins', array() );
 	// Validate vartype: array.
 	if ( ! is_array( $plugins ) ) {
-		update_option( 'active_plugins', array() );
+		update_option( 'active_plugins', array(), false );
 		$plugins = array();
 	}
 
@@ -1304,7 +1304,7 @@ function uninstall_plugin( $plugin ) {
 	if ( file_exists( WP_PLUGIN_DIR . '/' . dirname( $file ) . '/uninstall.php' ) ) {
 		if ( isset( $uninstallable_plugins[ $file ] ) ) {
 			unset( $uninstallable_plugins[ $file ] );
-			update_option( 'uninstall_plugins', $uninstallable_plugins );
+			update_option( 'uninstall_plugins', $uninstallable_plugins, false );
 		}
 		unset( $uninstallable_plugins );
 
@@ -1319,7 +1319,7 @@ function uninstall_plugin( $plugin ) {
 	if ( isset( $uninstallable_plugins[ $file ] ) ) {
 		$callable = $uninstallable_plugins[ $file ];
 		unset( $uninstallable_plugins[ $file ] );
-		update_option( 'uninstall_plugins', $uninstallable_plugins );
+		update_option( 'uninstall_plugins', $uninstallable_plugins, false );
 		unset( $uninstallable_plugins );
 
 		wp_register_plugin_realpath( WP_PLUGIN_DIR . '/' . $file );
@@ -2610,7 +2610,7 @@ function deactivated_plugins_notice() {
 
 	if ( false === $blog_deactivated_plugins ) {
 		// Option not in database, add an empty array to avoid extra DB queries on subsequent loads.
-		update_option( 'wp_force_deactivated_plugins', array() );
+		update_option( 'wp_force_deactivated_plugins', array(), false );
 	}
 
 	if ( is_multisite() ) {
@@ -2664,7 +2664,7 @@ function deactivated_plugins_notice() {
 	}
 
 	// Empty the options.
-	update_option( 'wp_force_deactivated_plugins', array() );
+	update_option( 'wp_force_deactivated_plugins', array(), false );
 	if ( is_multisite() ) {
 		update_site_option( 'wp_force_deactivated_plugins', array() );
 	}
