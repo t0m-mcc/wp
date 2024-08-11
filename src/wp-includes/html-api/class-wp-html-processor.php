@@ -281,11 +281,13 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	 *
 	 * ## Current HTML Support
 	 *
-	 *  - The only supported context is `<body>`, which is the default value.
 	 *  - The only supported document encoding is `UTF-8`, which is the default value.
+	 *
+	 * @todo Verify that creating a fragment in self-contained elements works.
 	 *
 	 * @since 6.4.0
 	 * @since 6.6.0 Returns `static` instead of `self` so it can create subclass instances.
+	 * @since 6.7.0 Can create fragment in any context.
 	 *
 	 * @param string $html     Input HTML fragment to process.
 	 * @param string $context  Context element for the fragment, must be default of `<body>`.
@@ -293,12 +295,27 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	 * @return static|null The created processor if successful, otherwise null.
 	 */
 	public static function create_fragment( $html, $context = '<body>', $encoding = 'UTF-8' ) {
-		if ( '<body>' !== $context || 'UTF-8' !== $encoding ) {
+		if ( 'UTF-8' !== $encoding ) {
+			return null;
+		}
+
+		$context_processor = new WP_HTML_Tag_Processor( $context );
+		if ( ! $context_processor->next_token() || '#tag' !== $context_processor->get_token_type() ) {
+			return null;
+		}
+
+		$context_tag        = $context_processor->get_tag();
+		$context_attributes = array();
+		foreach ( $context_processor->get_attribute_names_with_prefix( '' ) as $name ) {
+			$context_attributes[ $name ] = $context_processor->get_attribute( $name );
+		}
+
+		if ( $context_processor->next_token() ) {
 			return null;
 		}
 
 		$processor                             = new static( $html, self::CONSTRUCTOR_UNLOCK_CODE );
-		$processor->state->context_node        = array( 'BODY', array() );
+		$processor->state->context_node        = array( $context_tag, $context_attributes );
 		$processor->state->insertion_mode      = WP_HTML_Processor_State::INSERTION_MODE_IN_BODY;
 		$processor->state->encoding            = $encoding;
 		$processor->state->encoding_confidence = 'certain';
